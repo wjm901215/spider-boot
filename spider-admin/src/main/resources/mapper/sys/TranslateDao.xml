@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.TranslateDao">
+
+    <resultMap type="com.spider.ma.modules.sys.entity.TranslateEntity" id="translateMap">
+        <result property="id" column="ID"/>
+        <result property="extId" column="EXT_ID"/>
+        <result property="lang" column="LANG"/>
+        <result property="langName" column="LANG_NAME"/>
+        <result property="translation" column="TRANSLATION"/>
+    </resultMap>
+
+    <select id="queryTranslateByExtId" resultMap="translateMap">
+        select
+        t.ID,
+        l.CODE_VALUE LANG,
+        l.CODE_TEXT LANG_NAME,
+        t.TRANSLATION
+        from
+        (select d.CODE_VALUE,d.CODE_TEXT from sys_dictionary d where d.CODE_TYPE = 'LANG') l
+        left join (select bt.ID,bt.TRANSLATION,bt.LANG from base_translate bt where bt.EXT_ID = #{extId})t on t.LANG = l.CODE_VALUE
+    </select>
+</mapper>

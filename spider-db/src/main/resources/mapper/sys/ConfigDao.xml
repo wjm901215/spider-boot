@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spider.ma.db.sys.dao.ConfigDao">
+
+
+    <select id="queryList" resultType="com.spider.ma.db.sys.entity.ConfigEntity">
+        select c.*,
+        IFNULL(t.name,'系统') TENANT_NAME
+        from
+        sys_config c
+        left join base_tenant t on c.tenant_id = t.id
+        where c.DELETED = 0
+        <if test="tenantId != null and tenantId != ''">
+            and c.TENANT_ID = #{tenantId}
+        </if>
+        <if test="paramKey != null and paramKey != ''">
+            and c.PARAM_KEY = #{paramKey}
+        </if>
+        <if test="type != null and type != ''">
+            and c.`TYPE` = #{type}
+        </if>
+    </select>
+
+    <!-- 根据key，更新value -->
+    <update id="updateValueByKey" parameterType="map">
+		update sys_config set param_value = #{paramValue} where param_key = #{paramKey}
+	</update>
+
+    <!-- 根据key，查询value -->
+    <select id="queryByKey" parameterType="string" resultType="com.spider.ma.db.sys.entity.ConfigEntity">
+		select * from sys_config where param_key = #{paramKey}
+	</select>
+
+</mapper>

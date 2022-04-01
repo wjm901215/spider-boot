@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.DictionaryDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.spider.ma.modules.sys.entity.DictionaryEntity" id="dictionaryMap">
+        <result property="id" column="ID"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="codeType" column="CODE_TYPE"/>
+        <result property="codeValue" column="CODE_VALUE"/>
+        <result property="codeText" column="CODE_TEXT"/>
+        <result property="codeName" column="CODE_NAME"/>
+        <result property="state" column="STATE"/>
+        <result property="orderNum" column="ORDER_NUM"/>
+        <result property="isCommon" column="IS_COMMON"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="deleted" column="DELETED"/>
+        <result property="translation" column="TRANSLATION"/>
+    </resultMap>
+
+
+    <resultMap type="java.util.Map" id="dictMap">
+        <result property="tenantName" column="TENANT_NAME"/>
+        <result property="codeType" column="CODE_TYPE"/>
+        <result property="codeName" column="CODE_NAME"/>
+        <result property="isCommon" column="IS_COMMON"/>
+        <result property="rowCount" column="ROW_COUNT"/>
+        <result property="tenantId" column="TENANT_ID"/>
+    </resultMap>
+
+
+    <!-- dictionary table all fields -->
+    <sql id="Base_Column_List">
+		id,tenant_id,code_type,code_value,code_text,state,code_name,order_num,is_common,create_By,create_Time,update_By,update_Time
+	</sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where ((is_common = 0 or is_common = 1)
+        <trim suffixOverrides=",">
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="codeType != null and codeType != ''">
+                and code_type = #{codeType}
+            </if>
+            <if test="codeValue != null and codeValue != ''">
+                and code_value = #{codeValue}
+            </if>
+            <if test="codeText != null and codeText != ''">
+                and code_text like '%'||#{codeText}||'%'
+            </if>
+            <if test="state != null">
+                and state = #{state}
+            </if>
+            <if test="orderNum != null">
+                and order_num = #{orderNum}
+            </if>
+            <if test="codeName != null and codeName != ''">
+                and code_name like '%'||#{codeName}||'%'
+            </if>
+        </trim>
+    </sql>
+
+
+    <!-- 根据信息类型查询字典 -->
+    <select id="queryInfoByCodeName" resultMap="dictionaryMap"
+            parameterType="Object">
+        select
+        d.*,
+        (select t.translation from base_translate t where t.ext_id = d.id and t.lang = #{lang}) TRANSLATION
+        from sys_dictionary d
+        where DELETED = 0
+        <if test="codeName != null">
+            and d.code_name=#{codeName}
+        </if>
+        <if test="codeType != null">
+            and d.code_type=#{codeType}
+        </if>
+        <if test="tenantId != null and tenantId != ''">
+            and (d.IS_COMMON = 1 or d.TENANT_ID = #{tenantId})
+        </if>
+        order by d.ORDER_NUM
+    </select>
+
+
+    <select id="selectDictionaryType" resultMap="dictMap">
+        SELECT
+        IFNULL(t.`NAME`,'系统') TENANT_NAME,
+        d.TENANT_ID,
+        d.CODE_TYPE,
+        d.CODE_NAME,
+        d.IS_COMMON,
+        COUNT(d.id) ROW_COUNT
+        FROM
+        sys_dictionary d
+        LEFT JOIN base_tenant t ON d.TENANT_ID = t.ID
+        where d.DELETED = 0
+        <if test="codeType != null and codeType != ''">
+            and d.code_type like concat('%',#{codeType},'%')
+        </if>
+        <if test="codeValue != null and codeValue != ''">
+            and d.code_value like concat('%',#{codeValue},'%')
+        </if>
+        <if test="codeText != null and codeText != ''">
+            and d.code_text like concat('%',#{codeText},'%')
+        </if>
+        <if test="codeName != null and codeName != ''">
+            and d.code_name like concat('%',#{codeName},'%')
+        </if>
+        GROUP BY
+        d.CODE_TYPE,
+        d.CODE_NAME,
+        d.IS_COMMON,
+        d.TENANT_ID,
+        t.`NAME`
+    </select>
+
+
+</mapper>

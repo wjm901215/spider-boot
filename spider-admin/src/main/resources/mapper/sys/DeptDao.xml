@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.DeptDao">
+
+    <resultMap type="com.spider.ma.modules.sys.entity.DeptEntity" id="deptMap">
+        <result property="id" column="ID"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="shortName" column="SHORT_NAME"/>
+        <result property="code" column="CODE"/>
+        <result property="parentId" column="PARENT_ID"/>
+        <result property="orderNum" column="ORDER_NUM"/>
+        <result property="longitudeBaidu" column="LONGITUDE_BAIDU"/>
+        <result property="latitudeBaidu" column="LATITUDE_BAIDU"/>
+        <result property="longitudeGaode" column="LONGITUDE_GAODE"/>
+        <result property="latitudeGaode" column="LATITUDE_GAODE"/>
+        <result property="level" column="LEVEL"/>
+        <result property="deleted" column="DELETED"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="parentName" column="PARENT_NAME"/>
+    </resultMap>
+
+
+    <select id="page" parameterType="object" resultMap="deptMap">
+        SELECT
+        d.*,
+        ( SELECT sd.`NAME` FROM sys_dept sd WHERE sd.ID = d.PARENT_ID ) PARENT_NAME
+        FROM
+        sys_dept d
+        where d.deleted = 0
+        <if test="id != null and id !='' ">
+            and d.ID = #{id}
+        </if>
+        <if test="tenantId != null and tenantId !='' ">
+            and d.TENANT_ID = #{tenantId}
+        </if>
+        <if test="name != null and name !='' ">
+            and d.NAME like concat('%',#{name},'%')
+        </if>
+        <if test="shortName != null and shortName !='' ">
+            and d.SHORT_NAME = #{shortName}
+        </if>
+        <if test="code != null and code !='' ">
+            and d.CODE like concat('%',#{code},'%')
+        </if>
+        <if test="parentId != null and parentId !='' ">
+            and d.PARENT_ID = #{parentId}
+        </if>
+        <if test="orderNum != null and orderNum !='' ">
+            and d.ORDER_NUM = #{orderNum}
+        </if>
+        <if test="longitudeBaidu != null and longitudeBaidu !='' ">
+            and d.LONGITUDE_BAIDU = #{longitudeBaidu}
+        </if>
+        <if test="latitudeBaidu != null and latitudeBaidu !='' ">
+            and d.LATITUDE_BAIDU = #{latitudeBaidu}
+        </if>
+        <if test="longitudeGaode != null and longitudeGaode !='' ">
+            and d.LONGITUDE_GAODE = #{longitudeGaode}
+        </if>
+        <if test="latitudeGaode != null and latitudeGaode !='' ">
+            and d.LATITUDE_GAODE = #{latitudeGaode}
+        </if>
+        <if test="level != null and level !='' ">
+            and d.LEVEL = #{level}
+        </if>
+        <if test="deleted != null and deleted !='' ">
+            and d.DELETED = #{deleted}
+        </if>
+        <if test="createBy != null and createBy !='' ">
+            and d.CREATE_BY = #{createBy}
+        </if>
+        <if test="createTime != null and createTime !='' ">
+            and d.CREATE_TIME = #{createTime}
+        </if>
+        <if test="updateBy != null and updateBy !='' ">
+            and d.UPDATE_BY = #{updateBy}
+        </if>
+        <if test="updateTime != null and updateTime !='' ">
+            and d.UPDATE_TIME = #{updateTime}
+        </if>
+        <if test="remark != null and remark !='' ">
+            and d.REMARK = #{remark}
+        </if>
+    </select>
+
+
+    <update id="deleteBatchIds" parameterType="java.util.List">
+        update sys_dept set deleted = 1
+        where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryCascadeList" parameterType="java.util.Map" resultType="java.util.Map">
+        select id,TENANT_ID tenantId,`name`,PARENT_ID parentId,`level` from sys_dept
+        where DELETED = 0
+       <!-- <if test="userId != null and userId != ''">
+            and TENANT_ID in (select sud.EXT_ID from SYS_USER_DATA sud WHERE sud.EXT_TYPE = 10 and sud.USER_ID = #{userId})
+        </if>-->
+    </select>
+</mapper>

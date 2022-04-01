@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.PersonnelDao">
+
+    <resultMap type="com.spider.ma.modules.sys.entity.PersonnelEntity" id="personnelMap">
+        <result property="id" column="ID"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <!--<result property="squadronId" column="SQUADRON_ID"/>-->
+        <result property="deptId" column="DEPT_ID"/>
+        <result property="jobType" column="JOB_TYPE"/>
+        <result property="status" column="STATUS"/>
+        <result property="name" column="NAME"/>
+        <result property="sex" column="SEX"/>
+        <result property="mobile" column="MOBILE"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="identityNo" column="IDENTITY_NO"/>
+        <result property="birthDate" column="BIRTH_DATE"/>
+        <result property="headUrl" column="HEAD_URL"/>
+        <result property="entryDate" column="ENTRY_DATE"/>
+        <result property="leaveDate" column="LEAVE_DATE"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="deleted" column="DELETED"/>
+        <result property="remark" column="REMARK"/>
+    </resultMap>
+
+    <resultMap type="com.spider.ma.modules.sys.entity.PersonnelEntity" id="personnelServiceMap" extends="personnelMap">
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="email" column="EMAIL"/>
+    </resultMap>
+
+    <select id="page" parameterType="object" resultMap="personnelMap">
+      select
+       *
+      from base_personnel
+      where deleted = 0
+      <if test="id != null and id !='' ">
+          and ID = #{id}
+      </if>
+      <if test="tenantId != null and tenantId !='' ">
+          and TENANT_ID = #{tenantId}
+      </if>
+      <if test="squadronId != null and squadronId !='' ">
+          and SQUADRON_ID = #{squadronId}
+      </if>
+      <if test="deptId != null and deptId !='' ">
+          and DEPT_ID = #{deptId}
+      </if>
+      <if test="jobType != null and jobType !='' ">
+          and JOB_TYPE = #{jobType}
+      </if>
+      <if test="status != null and status !='' ">
+          and STATUS = #{status}
+      </if>
+      <if test="name != null and name !='' ">
+          and NAME like concat(#{name},'%')
+      </if>
+      <if test="sex != null and sex !='' ">
+          and SEX = #{sex}
+      </if>
+      <if test="mobile != null and mobile !='' ">
+          and MOBILE = #{mobile}
+      </if>
+      <if test="address != null and address !='' ">
+          and ADDRESS = #{address}
+      </if>
+      <if test="identityNo != null and identityNo !='' ">
+          and IDENTITY_NO = #{identityNo}
+      </if>
+      <if test="birthDate != null and birthDate !='' ">
+          and BIRTH_DATE = #{birthDate}
+      </if>
+      <if test="headUrl != null and headUrl !='' ">
+          and HEAD_URL = #{headUrl}
+      </if>
+      <if test="entryDate != null and entryDate !='' ">
+          and ENTRY_DATE = #{entryDate}
+      </if>
+      <if test="leaveDate != null and leaveDate !='' ">
+          and LEAVE_DATE = #{leaveDate}
+      </if>
+      <if test="createBy != null and createBy !='' ">
+          and CREATE_BY = #{createBy}
+      </if>
+      <if test="createTime != null and createTime !='' ">
+          and CREATE_TIME = #{createTime}
+      </if>
+      <if test="updateBy != null and updateBy !='' ">
+          and UPDATE_BY = #{updateBy}
+      </if>
+      <if test="updateTime != null and updateTime !='' ">
+          and UPDATE_TIME = #{updateTime}
+      </if>
+      <if test="deleted != null and deleted !='' ">
+          and DELETED = #{deleted}
+      </if>
+      <if test="remark != null and remark !='' ">
+          and REMARK = #{remark}
+      </if>
+    </select>
+
+    <select id="pageService" parameterType="object" resultMap="personnelServiceMap">
+        select
+        b.*,s.EMAIL,s.USERNAME,s.PASSWORD
+        from pep_service_user s left join base_personnel b on s.PERSONNEL_ID=b.id
+        where b.deleted = 0
+        <if test="jobType != null and jobType !='' ">
+            and b.JOB_TYPE = #{jobType}
+        </if>
+        <if test="status != null and status !='' ">
+            and b.STATUS = #{status}
+        </if>
+        <if test="name != null and name !='' ">
+            and b.NAME like concat(#{name},'%')
+        </if>
+        <if test="identityNo != null and identityNo !='' ">
+            and b.IDENTITY_NO = #{identityNo}
+        </if>
+        <if test="pepList != null ">
+            and b.JOB_TYPE in
+            <foreach collection="pepList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <update id="deleteBatchIds" parameterType="java.util.List">
+        update base_personnel set deleted = 1
+        where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getPersonnels"  resultType="map" parameterType="map">
+        select id,name from base_personnel where deleted = 0
+        and JOB_TYPE in
+        <foreach collection="pepList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

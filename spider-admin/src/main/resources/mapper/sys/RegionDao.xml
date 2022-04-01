@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.RegionDao">
+
+    <resultMap id="BaseResultMap" type="com.spider.ma.modules.sys.entity.RegionEntity">
+        <result column="id" property="id"/>
+        <result column="region_code" property="regionCode"/>
+        <result column="region_name" property="regionName"/>
+        <result column="short_name" property="shortName"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="region_level" property="regionLevel"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="note" property="note"/>
+        <result column="region_type" property="longitude"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,region_code,region_name,short_name,parent_id,region_level,order_num,longitude,latitude,note,region_type
+	</sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim suffixOverrides=",">
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="regionCode != null and regionCode != ''">
+                and region_code = #{regionCode}
+            </if>
+            <if test="regionName != null and regionName != ''">
+                and region_name like '%'||#{regionName}||'%'
+            </if>
+            <if test="shortName != null and shortName != ''">
+                and short_name = #{shortName}
+            </if>
+            <if test="parentId != null and parentId != ''">
+                and parent_id = #{parentId}
+            </if>
+            <if test="regionLevel != null and regionLevel !=''">
+                and region_level = #{regionLevel}
+            </if>
+            <if test="regionType !=null">
+                and region_type = #{regionType}
+            </if>
+        </trim>
+    </sql>
+
+    <!-- 查询列表 -->
+    <select id="queryList" resultMap="BaseResultMap"
+            parameterType="Object">
+        select
+        <include refid="Base_Column_List"/>
+        from base_region
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+    <!-- 根据id查询 -->
+    <select id="queryById" resultMap="BaseResultMap" parameterType="Object">
+        select
+        <include refid="Base_Column_List"/>
+        from base_region where id = #{id}
+    </select>
+
+    <select id="getRegionTree" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from base_region m start with m.region_code=#{regionCode} connect by m.parent_id=prior m.id
+    </select>
+    <select id="queryPageList" resultType="com.spider.ma.modules.sys.entity.RegionEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from base_region
+        where 1=1
+        <if test="parentId != null and parentId != ''">
+            and (id=#{parentId} or parent_id = #{parentId})
+        </if>
+    </select>
+
+    <select id="queryRecursiveUpId" resultType="Long" parameterType="Long">
+        select id from base_region m start with m.id=#{id} connect by prior m.parent_id= m.id order by region_level
+    </select>
+
+
+    <select id="queryAllRegion" resultMap="BaseResultMap"
+            parameterType="Object">
+        select
+        <include refid="Base_Column_List" />
+        from base_region
+        <include refid="Example_Where_Clause" />
+        order by region_code
+    </select>
+
+</mapper>

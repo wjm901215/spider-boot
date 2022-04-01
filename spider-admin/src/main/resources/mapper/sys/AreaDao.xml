@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.AreaDao">
+
+    <resultMap type="com.spider.ma.modules.sys.entity.AreaEntity" id="areaMap">
+        <result property="id" column="ID"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="code" column="CODE"/>
+        <result property="parentId" column="PARENT_ID"/>
+        <result property="parentName" column="PARENT_NAME"/>
+        <result property="level" column="LEVEL"/>
+        <result property="longitudeBaidu" column="LONGITUDE_BAIDU"/>
+        <result property="latitudeBaidu" column="LATITUDE_BAIDU"/>
+        <result property="longitudeGaode" column="LONGITUDE_GAODE"/>
+        <result property="latitudeGaode" column="LATITUDE_GAODE"/>
+        <result property="orderNum" column="ORDER_NUM"/>
+        <result property="deleted" column="DELETED"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+    </resultMap>
+
+    <resultMap id="areaOptionMap" type="java.util.Map">
+        <result property="value" column="ID"/>
+        <result property="label" column="NAME"/>
+        <result property="level" column="LEVEL"/>
+        <result property="parentId" column="PARENT_ID"/>
+    </resultMap>
+
+    <select id="page" parameterType="object" resultMap="areaMap">
+        select
+        a1.*,
+        a2.name PARENT_NAME
+        from sys_area a1
+        left join sys_area a2 on a2.id = a1.PARENT_ID
+        where a1.deleted = 0
+        <if test="id != null and id !='' ">
+            and a1.ID = #{id}
+        </if>
+        <if test="tenantId != null and tenantId !='' ">
+            and a1.TENANT_ID = #{tenantId}
+        </if>
+        <if test="name != null and name !='' ">
+            and a1.NAME = #{name}
+        </if>
+        <if test="code != null and code !='' ">
+            and a1.CODE = #{code}
+        </if>
+        <if test="parentId != null and parentId !='' ">
+            and a1.PARENT_ID = #{parentId}
+        </if>
+        <if test="level != null and level !='' ">
+            and a1.LEVEL = #{level}
+        </if>
+        <if test="longitudeBaidu != null and longitudeBaidu !='' ">
+            and a1.LONGITUDE_BAIDU = #{longitudeBaidu}
+        </if>
+        <if test="latitudeBaidu != null and latitudeBaidu !='' ">
+            and a1.LATITUDE_BAIDU = #{latitudeBaidu}
+        </if>
+        <if test="longitudeGaode != null and longitudeGaode !='' ">
+            and a1.LONGITUDE_GAODE = #{longitudeGaode}
+        </if>
+        <if test="latitudeGaode != null and latitudeGaode !='' ">
+            and a1.LATITUDE_GAODE = #{latitudeGaode}
+        </if>
+        <if test="orderNum != null and orderNum !='' ">
+            and a1.ORDER_NUM = #{orderNum}
+        </if>
+        <if test="deleted != null and deleted !='' ">
+            and a1.DELETED = #{deleted}
+        </if>
+        <if test="createBy != null and createBy !='' ">
+            and a1.CREATE_BY = #{createBy}
+        </if>
+        <if test="createTime != null and createTime !='' ">
+            and a1.CREATE_TIME = #{createTime}
+        </if>
+        <if test="updateBy != null and updateBy !='' ">
+            and a1.UPDATE_BY = #{updateBy}
+        </if>
+        <if test="updateTime != null and updateTime !='' ">
+            and a1.UPDATE_TIME = #{updateTime}
+        </if>
+        <if test="remark != null and remark !='' ">
+            and a1.REMARK = #{remark}
+        </if>
+    </select>
+
+
+    <update id="deleteBatchIds" parameterType="java.util.List">
+        update sys_area set deleted = 1
+        where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryCascadeList" parameterType="java.util.Map" resultType="java.util.Map">
+        select id,`CODE` code,`name`,PARENT_ID parentId,`level` from sys_area
+        where DELETED = 0
+       <!-- <if test="userId != null and userId != ''">
+           and TENANT_ID in (select sud.EXT_ID from SYS_USER_DATA sud WHERE sud.EXT_TYPE = 10 and sud.USER_ID = #{userId})
+        </if>-->
+        <if test="level != null">
+           and level=#{level}
+        </if>
+    </select>
+
+    <select id="queryAreaOptions" resultMap="areaOptionMap">
+        select ID,NAME,PARENT_ID,LEVEL from sys_area  where deleted = 0
+    </select>
+</mapper>

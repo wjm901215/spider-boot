@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.db.sys.dao.UserTokenDao">
+
+    <resultMap type="com.spider.ma.db.sys.entity.UserTokenEntity" id="userTokenMap">
+        <result property="userId" column="USER_ID"/>
+        <result property="token" column="TOKEN"/>
+        <result property="createIp" column="CREATE_IP"/>
+        <result property="expireTime" column="EXPIRE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+
+    <select id="page" parameterType="object" resultMap="userTokenMap">
+        select
+        *
+        from sys_user_token
+        where deleted = 0
+        <if test="userId != null and userId !='' ">
+            and USER_ID = #{userId}
+        </if>
+        <if test="token != null and token !='' ">
+            and TOKEN = #{token}
+        </if>
+        <if test="createIp != null and createIp !='' ">
+            and CREATE_IP = #{createIp}
+        </if>
+        <if test="expireTime != null and expireTime !='' ">
+            and EXPIRE_TIME = #{expireTime}
+        </if>
+        <if test="updateTime != null and updateTime !='' ">
+            and UPDATE_TIME = #{updateTime}
+        </if>
+    </select>
+
+
+    <update id="deleteBatchIds" parameterType="java.util.List">
+        update sys_user_token set deleted = 1
+        where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <select id="getUserIdBySid" resultType="java.lang.String" parameterType="String">
+      select USER_ID from sys_user_token
+      where TOKEN = #{0}
+    </select>
+
+    <select id="getUserTokenBySid" resultMap="userTokenMap" parameterType="String">
+        select * from sys_user_token
+        where TOKEN = #{0}
+    </select>
+</mapper>

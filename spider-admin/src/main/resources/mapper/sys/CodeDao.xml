@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.CodeDao">
+
+    <resultMap id="BaseResultMap" type="com.spider.ma.modules.sys.entity.CodeEntity">
+        <result column="id" property="id"/>
+        <result column="city_code" property="cityCode"/>
+        <result column="code_type" property="codeType"/>
+        <result column="prefix" property="prefix"/>
+        <result column="max_code" property="maxCode"/>
+        <result column="max_len" property="maxLen"/>
+    </resultMap>
+
+    <!-- table all fields -->
+    <sql id="Base_Column_List">
+		 city_code,
+		 code_type,
+		 prefix,
+		 max_code,
+		 max_len,
+	     id
+</sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim suffixOverrides=",">
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="cityCode != null and cityCode != '' ">
+                and city_code = #{cityCode}
+            </if>
+            <if test="codeType != null and codeType != '' ">
+                and code_type = #{codeType}
+            </if>
+            <if test="prefix != null and prefix != '' ">
+                and prefix = #{prefix}
+            </if>
+            <if test="maxCode != null ">
+                and max_code = #{maxCode}
+            </if>
+            <if test="maxLen != null ">
+                and max_len = #{maxLen}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="getCodeByCityAndCodeType" parameterType="Object" resultMap="BaseResultMap">
+	select * from base_code where city_code = #{cityCode} and code_type = #{codeType}
+    </select>
+
+    <!-- 根据城市和编码类型获取编码 -->
+    <select id="getCodeByCityAndCodeType" parameterType="Object" resultMap="BaseResultMap">
+	select * from base_code where city_code = #{cityCode} and code_type = #{codeType}
+    </select>
+</mapper>

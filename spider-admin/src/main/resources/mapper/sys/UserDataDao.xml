@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.UserDataDao">
+
+    <resultMap type="com.spider.ma.modules.sys.entity.UserDataEntity" id="userDataMap">
+        <result property="id" column="ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="extId" column="EXT_ID"/>
+        <result property="extType" column="EXT_TYPE"/>
+        <result property="extName" column="EXT_NAME"/>
+    </resultMap>
+
+
+    <select id="page" parameterType="object" resultMap="userDataMap">
+      select
+       *
+      from sys_user_data
+      where deleted = 0
+      <if test="id != null and id !='' ">
+          and ID = #{id}
+      </if>
+      <if test="userId != null and userId !='' ">
+          and USER_ID = #{userId}
+      </if>
+      <if test="extId != null and extId !='' ">
+          and EXT_ID = #{extId}
+      </if>
+      <if test="extType != null and extType !='' ">
+          and EXT_TYPE = #{extType}
+      </if>
+    </select>
+
+    <select id="queryUserDataByUserId" resultMap="userDataMap">
+        select t.*,t1.`NAME` AS EXT_NAME from sys_user_data t,base_tenant t1 where t.USER_ID=#{userId} and t.EXT_ID=t1.ID
+    </select>
+
+
+    <update id="deleteBatchIds" parameterType="java.util.List">
+        update sys_user_data set deleted = 1
+        where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+</mapper>

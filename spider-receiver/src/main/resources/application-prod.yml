@@ -1,0 +1,54 @@
+spring:
+    datasource:
+        driverClassName: com.mysql.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        druid:
+            url: jdbc:mysql://127.0.0.1:3306/spider?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+            username: root
+            password: spider654321
+            initial-size: 1
+            max-active: 5
+            min-idle: 1
+            max-wait: 60000
+            pool-prepared-statements: true
+            max-pool-prepared-statement-per-connection-size: 20
+            time-between-eviction-runs-millis: 60000
+            min-evictable-idle-time-millis: 300000
+            validation-query: SELECT 1
+            test-while-idle: true
+            test-on-borrow: false
+            test-on-return: false
+            stat-view-servlet:
+                enabled: true
+                url-pattern: /druid/*
+                #login-username: admin
+                #login-password: admin
+            filter:
+                stat:
+                    log-slow-sql: true
+                    slow-sql-millis: 1000
+                    merge-sql: true
+                wall:
+                    config:
+                        multi-statement-allow: true
+    rabbitmq:
+        host: localhost
+        port: 5672
+        username: guest
+        password: guest
+        virtual-host: /
+        # 开启消息确认机制
+        publisher-confirm-type: correlated
+        #开启发送失败退回
+        publisher-returns: true
+        #开启执行return回调,(1.消息找不到对应的Exchange;2.找到了Exchange但是找不到对应的Queue)
+        template:
+            mandatory: true
+        # 手动提交消息
+        listener:
+            simple:
+                acknowledge-mode: manual
+            direct:
+                acknowledge-mode: manual
+logging:
+    path: /opt/app/log/spider-receiver

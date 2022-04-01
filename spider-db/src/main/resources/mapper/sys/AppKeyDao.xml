@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.db.sys.dao.AppKeyDao">
+    <resultMap type="com.spider.ma.db.sys.entity.AppKeyEntity" id="keyMap">
+        <result property="id" column="ID"/>
+        <result property="appId" column="APP_ID"/>
+        <result property="appKey" column="APP_KEY"/>
+        <result property="appName" column="APP_NAME"/>
+        <result property="appStatus" column="APP_STATUS"/>
+        <result property="appDesc" column="APP_DESC"/>
+        <result property="deleted" column="DELETED"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+    <select id="queryKeyByAppId" resultMap="keyMap" parameterType="String">
+        select *
+        from base_app_key
+        where app_id = #{app_id}
+          and app_status = 1
+          and deleted = 0
+    </select>
+</mapper>

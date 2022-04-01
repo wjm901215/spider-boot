@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.db.base.dao.VillageDao">
+
+    <resultMap type="com.spider.ma.db.base.entity.VillageEntity" id="villageMap">
+        <result property="id" column="ID"/>
+        <result property="streetCode" column="STREET_CODE"/>
+        <result property="commCode" column="COMM_CODE"/>
+        <result property="villName" column="VILL_NAME"/>
+        <result property="villCode" column="VILL_CODE"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="companyId" column="COMPANY_ID"/>
+        <result property="photo" column="PHOTO"/>
+        <result property="status" column="STATUS"/>
+        <result property="totalNum" column="TOTAL_NUM"/>
+        <result property="permNum" column="PERM_NUM"/>
+        <result property="partNum" column="PART_NUM"/>
+        <result property="longitude" column="LONGITUDE"/>
+        <result property="latitude" column="LATITUDE"/>
+        <result property="deleted" column="DELETED"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+    </resultMap>
+
+
+    <select id="page" parameterType="object" resultMap="villageMap">
+        select a.* from base_village a
+        where a.deleted = 0
+        <if test="streetCode != null and streetCode !='' ">
+            and a.STREET_CODE =  #{streetCode}
+        </if>
+        <if test="commCode != null and commCode !='' ">
+            and a.COMM_CODE = #{commCode}
+        </if>
+    </select>
+
+</mapper>

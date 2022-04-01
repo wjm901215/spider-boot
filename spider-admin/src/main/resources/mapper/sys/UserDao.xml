@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spider.ma.modules.sys.dao.UserDao">
+
+    <resultMap type="com.spider.ma.modules.sys.entity.UserEntity" id="userMap">
+        <result property="id" column="ID"/>
+        <result property="tenantId" column="TENANT_ID"/>
+        <result property="personnelId" column="PERSONNEL_ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="salt" column="SALT"/>
+        <result property="email" column="EMAIL"/>
+        <result property="status" column="STATUS"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="deleted" column="DELETED"/>
+        <result property="name" column="NAME"/>
+        <result property="sex" column="SEX"/>
+        <result property="mobile" column="MOBILE"/>
+        <result property="identityNo" column="IDENTITY_NO"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="account" column="ACCOUNT"/>
+        <result property="deptId" column="DEPT_ID"/>
+        <result property="jobType" column="JOB_TYPE"/>
+        <result property="lang" column="LANG"/>
+        <result property="workingStatus" column="WORKING_STATUS"/>
+        <result property="deptName" column="DEPT_NAME"/>
+        <result property="headUrl" column="HEAD_URL"/>
+        <result property="roleName" column="ROLE_NAME"/>
+    </resultMap>
+
+
+    <select id="page" parameterType="Object" resultMap="userMap">
+        SELECT
+        u.ID,
+        u.TENANT_ID,
+        p.`NAME`,
+        u.USERNAME ACCOUNT,
+        p.DEPT_ID,
+        d.`NAME` DEPT_NAME,
+        p.JOB_TYPE,
+        p.SEX,
+        p.MOBILE,
+        p.`STATUS` WORKING_STATUS,
+        u.`STATUS` `STATUS`,
+        u.DELETED,
+        u.CREATE_TIME,
+        u.PERSONNEL_ID,
+        ( SELECT GROUP_CONCAT(r.ROLE_NAME) from sys_user_role ur
+        LEFT JOIN sys_role r on ur.ROLE_ID = r.ROLE_ID
+        where ur.USER_ID = u.ID ) ROLE_NAME
+        FROM
+        sys_user u
+        LEFT JOIN base_personnel p ON u.PERSONNEL_ID = p.ID
+        left join sys_dept d on p.DEPT_ID = d.ID
+        WHERE
+        u.DELETED = 0
+        <if test="tenantId != null and tenantId !='' ">
+            and u.TENANT_ID = #{tenantId}
+        </if>
+        <if test="name != null and name != ''">
+            and p.`NAME` like concat('%',#{name},'%')
+        </if>
+        <if test="account != null and account != ''">
+            and u.USERNAME like concat('%',#{account},'%')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and p.DEPT_ID = #{deptId}
+        </if>
+        <if test="workingStatus != null and workingStatus != ''">
+            and p.`STATUS` = #{workingStatus}
+        </if>
+        <if test="jobType != null and jobType != ''">
+            and p.JOB_TYPE = #{jobType}
+        </if>
+        order by u.CREATE_TIME DESC
+    </select>
+
+    <update id="deleteBatchIds" parameterType="java.util.List">
+        update sys_user set deleted = 1
+        where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <select id="queryAllPerms" resultType="string">
+        select m.perms
+        from sys_user_role ur
+                 LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id
+                 LEFT JOIN sys_menu m on rm.menu_id = m.menu_id
+        where ur.user_id = #{userId}
+    </select>
+
+    <!-- 查询用户的所有菜单ID -->
+    <select id="queryAllMenuId" resultType="String">
+        select distinct rm.menu_id
+        from sys_user_role ur
+                 LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id
+        where ur.user_id = #{userId}
+    </select>
+
+    <select id="queryByUserName" resultType="com.spider.ma.modules.sys.entity.UserEntity">
+        select *
+        from sys_user
+        where username = #{username}
+    </select>
+
+    <select id="queryByUserId" resultMap="userMap">
+        select u.ID,
+               u.TENANT_ID,
+               u.PERSONNEL_ID,
+               u.USERNAME,
+               u.PASSWORD,
+               u.SALT,
+               p.NAME,
+               u.EMAIL,
+               u.STATUS,
+               u.CREATE_BY,
+               u.CREATE_TIME,
+               u.UPDATE_BY,
+               u.UPDATE_TIME,
+               u.DELETED,
+               p.JOB_TYPE,
+               p.LANG,
+               p.HEAD_URL
+        from sys_user u
+                 left join base_personnel p on u.personnel_id = p.id
+        where u.id = #{userId}
+    </select>
+
+    <select id="queryUserDetail" resultMap="userMap">
+        select
+               u.ID,
+               p.`NAME`,
+               p.SEX,
+               u.TENANT_ID,
+               p.MOBILE,
+               p.BIRTH_DATE,
+               p.ENTRY_DATE,
+               p.DEPT_ID,
+               p.JOB_TYPE,
+               u.USERNAME ACCOUNT,
+               p.IDENTITY_NO,
+               p.ADDRESS,
+               u.PERSONNEL_ID,
+               p.LANG,
+               p.HEAD_URL
+        from sys_user u
+                 left join base_personnel p on u.PERSONNEL_ID = p.ID
+        where u.id = #{userId}
+    </select>
+
+
+</mapper>
