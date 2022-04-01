@@ -24,9 +24,7 @@ spider-boot
 - 日志管理：SLF4J 1.7、Log4j
 - 页面交互：Vue2.x 
 <br> 
-
-## **服务架构图**
-![服务架构图.png](doc/pics/架构设计-服务架构.png)
+  
 
 ## **模块关系图**
 ![模块关系图.png](doc/pics/架构设计-模块关系图.png)
